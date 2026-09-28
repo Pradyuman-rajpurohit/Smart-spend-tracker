@@ -127,6 +127,25 @@ edition one of these two ways:
   If it still says "App not installed", delete the download and fetch the APK again; a
   file that was blocked halfway through can be left corrupted.
 
+### If the SMS permission itself is refused after installing
+
+On Android 13 and newer, an app installed from outside the Play Store is placed under a
+**restricted setting**: the SMS permission dialog either never appears or is denied at once.
+The app detects this and shows the steps, which are:
+
+1. Long-press the app icon → *App info* (or Settings → Apps → Spend).
+2. Tap the **⋮** menu in the top-right corner → **Allow restricted settings**. Confirm with
+   your PIN or fingerprint.
+3. On the same page open **Permissions → SMS → Allow**.
+4. Open the app and switch SMS capture on.
+
+With a cable, one command does the same without touching the phone's settings:
+
+```bash
+adb shell pm grant dev.spendtracker android.permission.RECEIVE_SMS
+adb shell pm grant dev.spendtracker android.permission.READ_SMS
+```
+
 **Build it yourself** (if you would rather not trust a prebuilt APK): open the folder in
 Android Studio and press Run, or from a terminal:
 

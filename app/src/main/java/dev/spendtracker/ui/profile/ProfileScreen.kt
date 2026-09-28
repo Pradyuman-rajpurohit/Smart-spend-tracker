@@ -3,7 +3,9 @@ package dev.spendtracker.ui.profile
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -113,16 +115,17 @@ fun ProfileScreen(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) add(Manifest.permission.POST_NOTIFICATIONS)
         }.toTypedArray()
     }
+    var showPermissionHelp by remember { mutableStateOf(false) }
     val enableLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
         if (result[Manifest.permission.RECEIVE_SMS] == true) {
             viewModel.setSmsEnabled(true)
         } else {
-            viewModel.showMessage("SMS permission was not given. Allow SMS for Spend under Android Settings > Apps, then switch this on again.")
+            showPermissionHelp = true
         }
     }
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) viewModel.importRecentSms()
-        else viewModel.showMessage("Reading messages needs the SMS permission.")
+        else showPermissionHelp = true
     }
 
     var creating by remember { mutableStateOf(false) }
@@ -389,6 +392,19 @@ fun ProfileScreen(
         )
     }
 
+    if (showPermissionHelp) {
+        SmsPermissionHelpDialog(
+            onOpenSettings = {
+                showPermissionHelp = false
+                context.startActivity(
+                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + context.packageName))
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+            },
+            onDismiss = { showPermissionHelp = false }
+        )
+    }
+
     if (showBlocked) {
         BlockedSendersDialog(
             terms = blocked.sorted(),
@@ -400,6 +416,48 @@ fun ProfileScreen(
 }
 
 private fun accountCountText(n: Int) = if (n == 1) "1 account" else "$n accounts"
+
+/**
+ * Shown when Android refuses the SMS permission. On Android 13+ a sideloaded app is put
+ * under "restricted settings" and the permission dialog is blocked until the user lifts
+ * that from the app's info page, so the steps are spelled out here.
+ */
+@Composable
+private fun SmsPermissionHelpDialog(onOpenSettings: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = SpendColors.Surface,
+        titleContentColor = SpendColors.Text,
+        textContentColor = SpendColors.Text,
+        title = { Text("Android blocked the SMS permission") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    "Because this app was installed from outside the Play Store, Android puts its SMS permission behind a “restricted setting”. It takes a minute to lift:",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = SpendColors.Muted
+                )
+                listOf(
+                    "1. Tap Open app settings below.",
+                    "2. Tap the ⋮ menu in the top-right corner and choose “Allow restricted settings”. Confirm with your PIN or fingerprint if asked.",
+                    "3. Back on the same page, open Permissions › SMS and choose Allow.",
+                    "4. Return here and switch SMS capture on again."
+                ).forEach { Text(it, style = MaterialTheme.typography.bodyMedium, color = SpendColors.Text) }
+                Text(
+                    "If the ⋮ menu has no such entry, go to Permissions › SMS directly. Nothing in this app talks to the internet; the messages never leave the phone.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = SpendColors.Muted
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onOpenSettings) { Text("Open app settings", color = SpendColors.VioletText) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Later", color = SpendColors.Muted) }
+        }
+    )
+}
 
 @Composable
 private fun BlockedSendersDialog(
