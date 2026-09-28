@@ -96,6 +96,18 @@ More detail: [docs/SMS-CAPTURE.md](docs/SMS-CAPTURE.md).
 on the phone and allow installing from that source. Updates install over the previous
 version and keep your data.
 
+> **Google Play Protect may block the install.** Because the app asks for SMS permission
+> and does not come from the Play Store, Play Protect (especially in India) refuses
+> sideloaded installs and shows "App not installed". Either:
+> - **Install with a cable**: enable USB debugging on the phone, connect it, and run
+>   `adb install Spend-<version>.apk` (or press Run in Android Studio). ADB installs are
+>   not blocked.
+> - **Or pause Play Protect once**: Play Store → your profile picture → *Play Protect* →
+>   settings gear → switch off *Scan apps with Play Protect*, install the APK, switch it
+>   back on.
+>
+> Nothing in the app talks to the internet; the block is only about the SMS permission.
+
 **Build it yourself** (if you would rather not trust a prebuilt APK): open the folder in
 Android Studio and press Run, or from a terminal:
 
