@@ -96,14 +96,12 @@ More detail: [docs/SMS-CAPTURE.md](docs/SMS-CAPTURE.md).
 on the phone and allow installing from that source. Updates install over the previous
 version and keep your data.
 
-**Build it yourself**: open the folder in Android Studio and press Run, or from a terminal:
+**Build it yourself** (if you would rather not trust a prebuilt APK): open the folder in
+Android Studio and press Run, or from a terminal:
 
 ```bash
 ./gradlew :app:testDebugUnitTest :app:assembleRelease
 ```
-
-Step-by-step instructions for a first-time Android Studio user are in
-[docs/SETUP.md](docs/SETUP.md).
 
 Requires Android 8.0 (API 26) or newer. On Android 13+ the app asks for the notification
 permission when you first use Autopay or SMS capture.
@@ -130,7 +128,7 @@ app/src/main/java/dev/spendtracker/
 └── util/        Money formatting, currencies, dates
 app/src/test/    Parser tests with sample bank messages
 app/schemas/     Exported Room schemas, one per database version
-docs/            Setup guide, SMS capture reference, screenshots
+docs/            SMS capture reference, screenshots
 ```
 
 ## Tech stack
