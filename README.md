@@ -67,6 +67,7 @@ front of you, and never sends a byte off the phone.
 | **Block list** | A lender that keeps repeating a stale reminder? Block the name; its messages are ignored. |
 | **Import** | Scan the last 30 days of SMS once on a phone that already has history. |
 
+SMS capture is in the **full** edition only; see [Install](#install) for why there are two.
 More detail: [docs/SMS-CAPTURE.md](docs/SMS-CAPTURE.md).
 
 <div align="center">
@@ -79,7 +80,8 @@ More detail: [docs/SMS-CAPTURE.md](docs/SMS-CAPTURE.md).
 
 - The app declares **no `INTERNET` permission**. There is no analytics, no crash reporting,
   no sync. Data cannot leave the phone through the app.
-- SMS is read only after you switch capture on. Only bank alerts are stored (the original
+- The lite edition declares **no SMS permission at all**; the full edition declares it but
+  reads nothing until you switch capture on. Only bank alerts are stored (the original
   text is kept with the transaction so you can check it); every other message is discarded
   as soon as it is parsed.
 - Notifications hide amounts and payee names on the lock screen.
@@ -92,28 +94,47 @@ More detail: [docs/SMS-CAPTURE.md](docs/SMS-CAPTURE.md).
 
 ## Install
 
-**Download**: grab `Spend-<version>.apk` from the [Releases](../../releases) page, open it
-on the phone and allow installing from that source. Updates install over the previous
-version and keep your data.
+Every release ships **two APKs** built from the same code. Pick one from the
+[Releases](../../releases) page:
 
-> **Google Play Protect may block the install.** Because the app asks for SMS permission
-> and does not come from the Play Store, Play Protect (especially in India) refuses
-> sideloaded installs and shows "App not installed". Either:
-> - **Install with a cable**: enable USB debugging on the phone, connect it, and run
->   `adb install Spend-<version>.apk` (or press Run in Android Studio). ADB installs are
->   not blocked.
-> - **Or pause Play Protect once**: Play Store → your profile picture → *Play Protect* →
->   settings gear → switch off *Scan apps with Play Protect*, install the APK, switch it
->   back on.
->
-> Nothing in the app talks to the internet; the block is only about the SMS permission.
+| File | What you get | Installs like |
+|---|---|---|
+| **`Spend-<version>-lite.apk`** | Everything except SMS capture: quick add, pending, autopay reminders, budgets, currencies, export. Declares no SMS permission. | Any normal app. Open the file, allow installs from that source, done. |
+| **`Spend-<version>-full.apk`** | All of the above plus SMS capture (bank alerts, mandates, EMI notices, block list). | Needs one extra step because of Google Play Protect, explained below. |
+
+Both use the same package name, so you can start with lite and install full over it later
+without losing anything. Updates always keep your data.
+
+### Why Play Protect blocks the full edition
+
+Google Play Protect scans every app installed from outside the Play Store. Since 2024 it
+refuses, in India and a growing list of countries, any sideloaded app whose manifest asks
+for **SMS permission**, because that permission is the main tool of banking fraud apps. It
+does not look at what the app does with it, and it does not matter that this app has no
+internet access and cannot send anything anywhere. The block shows up as "Unsafe app
+blocked" and then a plain "App not installed" on every retry.
+
+The Play Store is not a way out either: Google does not allow SMS permission for budgeting
+apps there. That is why the lite edition exists. If you want SMS capture, install the full
+edition one of these two ways:
+
+- **With a cable** (recommended, nothing to switch off): on the phone enable *Developer
+  options* (tap *Build number* seven times) and *USB debugging*, connect it to a PC and run
+  `adb install Spend-<version>-full.apk`, or press Run in Android Studio. Installs over
+  ADB are not scanned.
+- **Pause Play Protect once**: Play Store → your profile picture → *Play Protect* → gear
+  icon → switch off *Scan apps with Play Protect* → install the APK → switch it back on.
+  If it still says "App not installed", delete the download and fetch the APK again; a
+  file that was blocked halfway through can be left corrupted.
 
 **Build it yourself** (if you would rather not trust a prebuilt APK): open the folder in
 Android Studio and press Run, or from a terminal:
 
 ```bash
-./gradlew :app:testDebugUnitTest :app:assembleRelease
+./gradlew :app:testFullDebugUnitTest :app:assembleRelease
 ```
+
+This produces both editions under `app/build/outputs/apk/{lite,full}/release/`.
 
 Requires Android 8.0 (API 26) or newer. On Android 13+ the app asks for the notification
 permission when you first use Autopay or SMS capture.

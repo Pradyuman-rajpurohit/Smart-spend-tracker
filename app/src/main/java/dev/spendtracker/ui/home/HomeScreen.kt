@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.spendtracker.BuildConfig
 import dev.spendtracker.ui.appViewModel
 import dev.spendtracker.ui.pending.AutopayUi
 import dev.spendtracker.ui.pending.AutopayVisuals
@@ -81,7 +82,7 @@ fun HomeScreen(
                 if (state.reviewCount > 0) {
                     Pill(text = "${state.reviewCount} to review", onClick = onOpenReview)
                 }
-                SmsStatusBadge(enabled = state.smsEnabled)
+                if (BuildConfig.SMS_CAPTURE) SmsStatusBadge(enabled = state.smsEnabled)
             }
         }
 

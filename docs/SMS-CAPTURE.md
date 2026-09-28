@@ -1,5 +1,8 @@
 # SMS capture: how it works
 
+Available in the **full** edition only. The lite edition declares no SMS permission and
+hides these features; the README's Install section explains why there are two editions.
+
 Everything here runs on the phone. The parser is pure Kotlin
 (`app/src/main/java/dev/spendtracker/sms/SmsParser.kt`) and is covered by unit tests with
 sample messages (`app/src/test/.../SmsParserTest.kt`).

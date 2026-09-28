@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.spendtracker.BuildConfig
 import dev.spendtracker.data.db.Account
 import dev.spendtracker.data.db.AccountType
 import dev.spendtracker.ui.appViewModel
@@ -264,7 +265,7 @@ fun ProfileScreen(
                     )
                 }
             }
-            item {
+            if (BuildConfig.SMS_CAPTURE) item {
                 AppCard(contentPadding = PaddingValues(0.dp)) {
                     Row(
                         Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 14.dp),
@@ -342,7 +343,8 @@ fun ProfileScreen(
             }
             item {
                 Text(
-                    "Spend 0.3.1 · all data stays on this phone",
+                    "Spend " + BuildConfig.VERSION_NAME + " · all data stays on this phone" +
+                        (if (BuildConfig.SMS_CAPTURE) "" else " · lite edition, no SMS access"),
                     style = MaterialTheme.typography.bodySmall,
                     color = SpendColors.Inactive,
                     modifier = Modifier.padding(horizontal = 4.dp)

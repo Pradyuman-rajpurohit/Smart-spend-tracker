@@ -13,8 +13,23 @@ android {
         applicationId = "dev.spendtracker"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "0.3.1"
+        versionCode = 6
+        versionName = "0.3.2"
+    }
+
+    // Two editions from one code base. "lite" declares no SMS permission at all, so Google
+    // Play Protect lets it install like any other sideloaded app; "full" adds SMS capture.
+    flavorDimensions += "edition"
+    productFlavors {
+        create("lite") {
+            dimension = "edition"
+            versionNameSuffix = "-lite"
+            buildConfigField("boolean", "SMS_CAPTURE", "false")
+        }
+        create("full") {
+            dimension = "edition"
+            buildConfigField("boolean", "SMS_CAPTURE", "true")
+        }
     }
 
     buildTypes {
@@ -37,6 +52,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
