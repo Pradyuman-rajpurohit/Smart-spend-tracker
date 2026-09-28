@@ -1,0 +1,16 @@
+*.iml
+.gradle/
+.kotlin/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+**/build/
+*.apk
+*.aab
+*.log
+# Finished builds copied out for installing; attach them to a GitHub release instead.
+/release/
